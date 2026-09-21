@@ -1,0 +1,137 @@
+#gamePicture {
+    width: 500px;
+    position: relative;
+
+    
+}
+
+#red_suraimu {
+    position: absolute;
+    width: 60px;
+    top: var(--red_suraimu-top);
+    left: var(--red_suraimu-left);
+
+    --red_suraimu_next_Y: 0px;
+    --red_suraimu_next_X: 0px;
+}
+
+#blue_suraimu {
+    position: absolute;
+    width: 60px;
+    top: var(--blue_suraimu-top);
+    left: var(--blue_suraimu-left);
+
+    --blue_suraimu_next_Y: 0px;
+    --blue_suraimu_next_X: 0px;
+}
+
+#skillActive {
+    width: 300px;
+    position: absolute;
+    top: 108px;
+    left: 168px;
+}
+
+#red {
+    color: red;
+}
+
+#blue {
+    color: blue;
+}
+
+#redCommands {
+    display: flex !important;
+    flex-direction: row !important;
+}
+
+#blueCommands {
+    display: flex !important;
+    flex-direction: row !important;
+}
+
+#diceResult {
+    background-color: white;
+    position: absolute;
+    top: 180px;
+    left: 200px;
+    font-size: 100px;
+}
+
+
+
+@keyframes move1 {
+    
+    from {
+        transform: translateX(-200px);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes move2 {
+    
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-200px);
+    }
+}
+
+@keyframes redMoveUpDown {
+    
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(var(--red_suraimu_next_Y));
+    }
+}
+
+@keyframes redMoveLeftRight {
+    
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(var(--red_suraimu_next_X));
+    }
+}
+
+@keyframes blueMoveUpDown {
+    
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(var(--blue_suraimu_next_Y));
+    }
+}
+
+@keyframes blueMoveLeftRight {
+    
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(var(--blue_suraimu_next_X));
+    }
+}
+
+
+
+
+
+/* 1---0 */
+/* 2---110 */
+/* 3---218 */
+
+

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オンラインゲーム</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <game id="game" style="display: none;">
+        <div id="gamePicture">
+            <img id="board" src="./81masu.png">
+            <img id="red_suraimu" src="./1Psuraimu1.png">
+            <img id="blue_suraimu" src="./2Psuraimu1.png">
+            <div id="skill_active">
+                <img id="skillActive" src="./skill_active1.png" style="display: none;">
+            </div>
+        </div>
+
+        <audio src="./gameBGM.mp3" id="gameBGM" loop></audio>
+
+        <div id="diceResult"></div>
+
+
+
+
+        <blue id="blue">
+
+            <p>青操作（逃げ切る）</p>
+
+            <div id="blueCommands">
+                <div id="blueFirst">？</div>
+                <div id="blueSecond">ーー？</div>
+                <div id="blueThird">ーー？</div>
+            </div>
+
+            <operation id="blueOperation">
+
+                <button type="button" id="blueUp">上１</button>
+
+                <button type="button" id="blueDown">下１</button>
+
+                <button type="button" id="blueLeft">左１</button>
+
+                <button type="button" id="blueRight">右１</button>
+
+                <button type="button" id="blueChooseSkill">スキル</button>
+
+                <button type="button" id="blueReady">決定</button>
+
+            </operation>
+
+            <div id="blueFinish" style="display: none;">
+
+                <div id="blueResult"></div>
+
+            </div>
+
+        </blue>
+
+
+
+        <red id="red">
+
+            <p>赤操作（捕まえる）</p>
+
+            <div id="redCommands">
+                <div id="redFirst">？</div>
+                <div id="redSecond">ーー？</div>
+                <div id="redThird">ーー？</div>
+                <div id="red4th" style="display: none;">ーー？</div>
+                <div id="red5th" style="display: none;">ーー？</div>
+                <div id="red6th" style="display: none;">ーー？</div>
+            </div>
+
+            <operation>
+
+                <button type="button" id="redUp">上１</button>
+
+                <button type="button" id="redDown">下１</button>
+
+                <button type="button" id="redLeft">左１</button>
+
+                <button type="button" id="redRight">右１</button>
+
+                <button type="button" id="redChooseSkill">スキル</button>
+
+                <button type="button" id="redReady">決定</button>
+
+            </operation>
+
+            <div id="redFinish" style="display: none;">
+
+                <div id="redResult"></div>
+
+                <button id="oneMore">つづける</button>
+
+            </div>
+
+        </red>
+
+    </game>
+
+    <matching id="matching">
+
+        <h1>オンラインゲーム</h1>
+
+        <button id="createRoom">部屋を作る</button>
+
+        <p id="roomMessage">部屋はありません</p>
+
+        <h2>部屋に参加</h2>
+
+        <input type="text" id="roomInput" placeholder="4桁の部屋番号">
+
+        <button id="joinRoom">参加する</button>
+
+        <p id="joinMessage"></p>
+
+        <p id="playerCount">参加人数：0人</p>
+
+        <p id="playerNumber">あなた：未参加</p>
+
+        <button id="gameStart" style="display: none;">ゲームスタート！</button>
+
+        <p>↓スキル選択↓：最後に選択したスキルが試合で使えます</p>
+
+        <button id="skill0">入れ替え</button>
+
+        <button id="skill1">運命のダイス</button>
+
+        <div>ルール説明！</div>
+
+        <div>このゲームは81マスのステージで追いかける側が逃げる側を捕まえる
+            ターン制ストラテジーだよ！追いが赤色、逃げが青色で、逃げは下の段まで逃げたら勝ち！
+            追いは青を捕まえたら勝ち！！1ターンに3回まで行動出来て、
+            相手の行動を予測して動こう！もちろん1回や2回だけでも行動できるよ。それも戦略だね。
+            そして、2ターン目からスキルが使えるよ！スキルは1試合に1回しか使えないけど
+            状況が逆転するほど強力だからここぞというときに使おう！これでルール説明おわり！
+            
+        </div>
+
+        <script src="script.js"></script>
+
+    </matching>
+
+</body>
+
+</html>
