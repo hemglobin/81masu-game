@@ -4,46 +4,43 @@ const WebSocket = require("ws");
 const { type } = require("os");
 const { send } = require("process");
 const console = require("console");
+const path = require("path");
 
 const httpServer = http.createServer((req, res) => {
 
-    if (req.url === "/") {
-        fs.readFile("index.html", (err, data) => {
+    let filePath = req.url === "/" ? "/index.html" : req.url;
 
-            if (err) {
-                res.writeHead(500);
-                res.end("エラー");
-                return;
-            }
+    // ?○○ のようなクエリを取り除く
+    filePath = filePath.split("?")[0];
 
-            res.writeHead(200, {
-                "Content-Type": "text/html; charset=utf-8"
-            });
+    const fullPath = path.join(__dirname, decodeURIComponent(filePath));
 
-            res.end(data);
+    fs.readFile(fullPath, (err, data) => {
+
+        if (err) {
+            res.writeHead(404);
+            res.end("Not Found");
+            return;
+        }
+
+        const ext = path.extname(fullPath).toLowerCase();
+
+        const contentTypes = {
+            ".html": "text/html; charset=utf-8",
+            ".js": "text/javascript; charset=utf-8",
+            ".css": "text/css; charset=utf-8",
+            ".png": "image/png",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".mp3": "audio/mpeg"
+        };
+
+        res.writeHead(200, {
+            "Content-Type": contentTypes[ext] || "application/octet-stream"
         });
 
-    } else if (req.url === "/script.js") {
-
-        fs.readFile("script.js", (err, data) => {
-
-            if (err) {
-                res.writeHead(500);
-                res.end("エラー");
-                return;
-            }
-
-            res.writeHead(200, {
-                "Content-Type": "text/javascript; charset=utf-8"
-            });
-
-            res.end(data);
-        });
-
-    } else {
-        res.writeHead(404);
-        res.end("Not Found");
-    }
+        res.end(data);
+    });
 
 });
 
