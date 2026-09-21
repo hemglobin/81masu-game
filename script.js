@@ -417,6 +417,20 @@ socket.addEventListener("message", (event) => {
             redThird.style.display = "block";
         }
 
+        if (blueDice >= 4 && blueDiceNext === 2) {
+            
+            blue4th.style.display = "none";
+            blue5th.style.display = "none";
+            blue6th.style.display = "none";
+
+        } else if (blueDice <= 3 && blueDiceNext === 2) {
+
+            blueFirst.style.display = "block";
+            blueSecond.style.display = "block";
+            blueThird.style.display = "block";
+
+        }
+
         updataButton();
     }
 
