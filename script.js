@@ -717,6 +717,8 @@ socket.addEventListener("message", (event) => {
 
         console.log("サイコロの結果：" + dice);
 
+        diceResult.style.display = "block";
+
         diceResult.textContent = dice + "回！";
 
         setTimeout(() => {
@@ -1117,7 +1119,7 @@ redChooseSkill.addEventListener("click", () => {
     sound1.play();
 });
 
-blueChooseSkill.addEventListener("click", (skillNumber) => {
+blueChooseSkill.addEventListener("click", () => {
 
     console.log("サーバーに青スキルを送信！");
 

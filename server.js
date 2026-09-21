@@ -50,6 +50,8 @@ httpServer.listen(PORT, "0.0.0.0", () => {
     console.log("Webサーバーを起動しました！");
 });
 
+
+
 const server = new WebSocket.Server({
     server: httpServer
 });
@@ -226,7 +228,7 @@ server.on("connection", (socket) => {
             console.log("ゲーム開始！");
             console.log("部屋番号：" + roomId);
 
-            
+
 
             rooms[roomId].player.forEach((player) => {
 
@@ -309,7 +311,7 @@ server.on("connection", (socket) => {
         if (data.type === "blueChooseSkill") {
 
             const roomId = socket.roomId;
-            
+
             const skill = data.skill;
 
             console.log(skill);
@@ -438,7 +440,7 @@ server.on("connection", (socket) => {
 
     });
 
-    
+
 
     function redCommand(command, roomId, clickCount) {
 
@@ -661,7 +663,8 @@ server.on("connection", (socket) => {
             const redSkill = rooms[roomId].redCommands.skill;
             const blueSkill = rooms[roomId].blueCommands.skill;
 
-            console.log("redSkill =" + redSkill);
+            console.log("redSkill =", redSkill);
+            console.log("blueSkill =", blueSkill);
 
             if (rooms[roomId].redDiceNext !== undefined) {
 
@@ -674,6 +677,8 @@ server.on("connection", (socket) => {
                 rooms[roomId].blueDiceNext++;
 
             }
+
+            
 
             if (redSkill === undefined &&
                 blueSkill === undefined) {
@@ -714,7 +719,7 @@ server.on("connection", (socket) => {
 
                     blueSkillFunction(blueSkill, roomId);
 
-                }, 3000)
+                }, 4000);
 
             }
 
@@ -1648,18 +1653,20 @@ server.on("connection", (socket) => {
         const redPosition = rooms[roomId].redPosition;
         const bluePosition = rooms[roomId].bluePosition;
 
-        if (skill === 0) {
+        rooms[roomId].player.forEach((player) => {
 
-            rooms[roomId].player.forEach((player) => {
+            player.send(JSON.stringify({
+                type: "skillActive_0",
+            }));
+        });
 
-                player.send(JSON.stringify({
-                    type: "skillActive_0",
-                }));
-            });
+        setTimeout(() => {
 
-            console.log("入れ替え発動！");
+            console.log("スキル：" + skill);
 
-            setTimeout(() => {
+            if (skill === 0) {
+
+                console.log("入れ替え発動！");
 
                 const temp = {
                     x: redPosition.x,
@@ -1687,13 +1694,37 @@ server.on("connection", (socket) => {
 
                 rooms[roomId].blueSkillCount = 1;
 
+                
+            } else if (skill === 1) {
+
+                console.log("運命のダイス発動！");
+
+                rooms[roomId].blueDice = Math.floor(Math.random() * 6) + 1;
+
+                const dice = rooms[roomId].blueDice;
+
+                rooms[roomId].player.forEach((player) => {
+
+                    player.send(JSON.stringify({
+                        type: "diceResult",
+                        dice: dice
+                    }));
+                });
+
+                rooms[roomId].blueSkillCount = 1;
+
                 rooms[roomId].blueDiceNext = 1;
-            }, 2500);
+            }
 
             rooms[roomId].blueFinish = true;
 
             rooms[roomId].blueCommands.skill = undefined;
-        }
+
+            commandStart(roomId);
+
+        }, 2500);
+
+
     }
 
 
