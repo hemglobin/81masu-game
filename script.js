@@ -323,19 +323,19 @@ socket.addEventListener("message", (event) => {
 
             if (command === 0) {
 
-                blueFirst.textContent = "４回目：上"
+                blue4th.textContent = "ーー４回目：上"
 
             } else if (command === 1) {
 
-                blueFirst.textContent = "４回目：下"
+                blue4th.textContent = "ーー４回目：下"
 
             } else if (command === 2) {
 
-                blueFirst.textContent = "４回目：左"
+                blue4th.textContent = "ーー４回目：左"
 
             } else if (command === 3) {
 
-                blueFirst.textContent = "４回目：右"
+                blue4th.textContent = "ーー４回目：右"
 
             }
         }
@@ -346,19 +346,19 @@ socket.addEventListener("message", (event) => {
 
             if (command === 0) {
 
-                blueFirst.textContent = "５回目：上"
+                blue5th.textContent = "ーー５回目：上"
 
             } else if (command === 1) {
 
-                blueFirst.textContent = "５回目：下"
+                blue5th.textContent = "ーー５回目：下"
 
             } else if (command === 2) {
 
-                blueFirst.textContent = "５回目：左"
+                blue5th.textContent = "ーー５回目：左"
 
             } else if (command === 3) {
 
-                blueFirst.textContent = "５回目：右"
+                blue5th.textContent = "ーー５回目：右"
 
             }
         }
@@ -369,19 +369,19 @@ socket.addEventListener("message", (event) => {
 
             if (command === 0) {
 
-                blueFirst.textContent = "６回目：上"
+                blue6th.textContent = "ーー６回目：上"
 
             } else if (command === 1) {
 
-                blueFirst.textContent = "６回目：下"
+                blue6th.textContent = "ーー６回目：下"
 
             } else if (command === 2) {
 
-                blueFirst.textContent = "６回目：左"
+                blue6th.textContent = "ーー６回目：左"
 
             } else if (command === 3) {
 
-                blueFirst.textContent = "６回目：右"
+                blue6th.textContent = "ーー６回目：右"
 
             }
         }
@@ -711,7 +711,7 @@ socket.addEventListener("message", (event) => {
         }, 2000);
     }
 
-    if (data.type === "diceResult") {
+    if (data.type === "redDiceResult") {
 
         const dice = data.dice;
 
@@ -753,6 +753,59 @@ socket.addEventListener("message", (event) => {
                                 if (dice === 6) {
 
                                     red6th.style.display = "block";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            diceResult.style.display = "none";
+        }, 1200);
+    }
+
+    if (data.type === "blueDiceResult") {
+
+        const dice = data.dice;
+
+        console.log("サイコロの結果：" + dice);
+
+        diceResult.style.display = "block";
+
+        diceResult.textContent = dice + "回！";
+
+        setTimeout(() => {
+
+            blueFirst.style.display = "none";
+            blueSecond.style.display = "none";
+            blueThird.style.display = "none";
+            blue4th.style.display = "none";
+            blue5th.style.display = "none";
+            blue6th.style.display = "none";
+
+            if (dice >= 1) {
+
+                blueFirst.style.display = "block";
+
+                if (dice >= 2) {
+
+                    blueSecond.style.display = "block";
+
+                    if (dice >= 3) {
+
+                        blueThird.style.display = "block";
+
+                        if (dice >= 4) {
+
+                            blue4th.style.display = "block";
+
+                            if (dice >= 5) {
+
+                                blue5th.style.display = "block";
+
+                                if (dice === 6) {
+
+                                    blue6th.style.display = "block";
                                 }
                             }
                         }
@@ -949,6 +1002,9 @@ const redCommands = document.getElementById("redCommands");
 const blueFirst = document.getElementById("blueFirst");
 const blueSecond = document.getElementById("blueSecond");
 const blueThird = document.getElementById("blueThird");
+const blue4th = document.getElementById("blue4th");
+const blue5th = document.getElementById("blue5th");
+const blue6th = document.getElementById("blue6th");
 
 const blueCommands = document.getElementById("blueCommands");
 

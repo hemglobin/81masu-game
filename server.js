@@ -1706,7 +1706,7 @@ server.on("connection", (socket) => {
                 rooms[roomId].player.forEach((player) => {
 
                     player.send(JSON.stringify({
-                        type: "diceResult",
+                        type: "blueDiceResult",
                         dice: dice
                     }));
                 });
