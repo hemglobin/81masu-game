@@ -9,7 +9,8 @@ const roomInput = document.getElementById("roomInput");
 const joinRoom = document.getElementById("joinRoom");
 const joinMessage = document.getElementById("joinMessage");
 
-const socket = new WebSocket("ws://localhost:8080");
+const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+const socket = new WebSocket(`${protocol}//${location.host}`);
 
 const playerCount = document.getElementById("playerCount");
 
