@@ -34,10 +34,16 @@
 
 #red {
     color: red;
+    position: absolute;
+    top: 600px;
+    left: 100px;
 }
 
 #blue {
     color: blue;
+    position: absolute;
+    top: 600px;
+    left: 100px;
 }
 
 #redCommands {
@@ -50,20 +56,14 @@
     flex-direction: row !important;
 }
 
-#diceResult {
-    background-color: white;
-    position: absolute;
-    top: 180px;
-    left: 200px;
-    font-size: 100px;
-}
+
 
 #goal {
     background-color: yellow;
     position: absolute;
     top: 506px;
     left: 215px;
-    font-size: 41px;
+    font-size: 38px;
 }
 
 
