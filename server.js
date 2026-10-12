@@ -115,13 +115,17 @@ server.on("connection", (socket) => {
                 redClickCount: 0,
                 blueClickCount: 0,
 
-                redDice: undefined,
-                blueDice: undefined,
-                redDiceNext: undefined,
-                blueDiceNext: undefined,
-
                 redFinish: false,
-                blueFinish: false
+                blueFinish: false,
+
+                redPoint: 3,
+                bluePoint: 3,
+
+                redCounter: false,
+                blueCounter: false,
+
+                redReverse: false,
+                blueReverse: false,
             };
 
             // このプレイヤーがいる部屋を記録
@@ -240,7 +244,9 @@ server.on("connection", (socket) => {
                     redY: rooms[roomId].redPosition.y,
                     blueX: rooms[roomId].bluePosition.x,
                     blueY: rooms[roomId].bluePosition.y,
-                    playerNumber: socket.playerNumber
+                    playerNumber: socket.playerNumber,
+                    redPoint: rooms[roomId].redPoint,
+                    bluePoint: rooms[roomId].bluePoint
                 }));
 
             });
@@ -260,15 +266,21 @@ server.on("connection", (socket) => {
 
             const command = data.command;
 
-            rooms[roomId].redCommandNumber = command;
+            if (rooms[roomId].redPoint > 0 && rooms[roomId].redCommands.skill === undefined) {
 
-            rooms[roomId].redClickCount++;
+                rooms[roomId].redPoint--;
 
-            const clickCount = rooms[roomId].redClickCount
+                rooms[roomId].redClickCount++;
 
-            redCommand(command, roomId, clickCount);
+                const clickCount = rooms[roomId].redClickCount;
 
-            console.log("aaa");
+                const point = rooms[roomId].redPoint;
+
+                redCommand(command, roomId, clickCount, point);
+
+                console.log("aaa");
+
+            }
         }
 
         if (data.type === "blueCommand") {
@@ -277,15 +289,22 @@ server.on("connection", (socket) => {
 
             const command = data.command;
 
-            rooms[roomId].blueCommandNumber = command;
+            if (rooms[roomId].bluePoint > 0 && rooms[roomId].blueCommands.skill === undefined) {
 
-            rooms[roomId].blueClickCount++;
+                rooms[roomId].bluePoint--;
 
-            const clickCount = rooms[roomId].blueClickCount
+                rooms[roomId].blueClickCount++;
 
-            blueCommand(command, roomId, clickCount);
+                const clickCount = rooms[roomId].blueClickCount;
 
-            console.log("aaa");
+                const point = rooms[roomId].bluePoint;
+
+                blueCommand(command, roomId, clickCount, point);
+
+                console.log("aaa");
+            }
+
+
         }
 
         if (data.type === "redChooseSkill") {
@@ -296,9 +315,18 @@ server.on("connection", (socket) => {
 
             console.log(skill);
 
-            if (rooms[roomId].redSkillCount === 0 && rooms[roomId].count !== 1) {
+            if (rooms[roomId].redSkillCount === 0 && rooms[roomId].count !== 1 && rooms[roomId].redPoint >= 2) {
+
+                rooms[roomId].redPoint = rooms[roomId].redPoint - 2;
 
                 rooms[roomId].redCommands.skill = skill;
+
+                const point = rooms[roomId].redPoint;
+
+                socket.send(JSON.stringify({
+                    type: "redChooseSkill",
+                    point: point
+                }));
 
                 console.log("赤スキル：" + rooms[roomId].redCommands.skill);
             } else {
@@ -316,9 +344,18 @@ server.on("connection", (socket) => {
 
             console.log(skill);
 
-            if (rooms[roomId].blueSkillCount === 0 && rooms[roomId].count !== 1) {
+            if (rooms[roomId].blueSkillCount === 0 && rooms[roomId].count !== 1 && rooms[roomId].bluePoint >= 2) {
+
+                rooms[roomId].bluePoint = rooms[roomId].bluePoint - 2;
 
                 rooms[roomId].blueCommands.skill = skill;
+
+                const point = rooms[roomId].bluePoint;
+
+                socket.send(JSON.stringify({
+                    type: "blueChooseSkill",
+                    point: point
+                }));
 
                 console.log("青スキル" + rooms[roomId].blueCommands.skill);
             } else {
@@ -442,109 +479,16 @@ server.on("connection", (socket) => {
 
 
 
-    function redCommand(command, roomId, clickCount) {
+    function redCommand(command, roomId, clickCount, point) {
 
-        const dice = rooms[roomId].redDice;
+        rooms[roomId].redCommands.move.push(command);
 
-        if (dice >= 1 && clickCount === 1) {
-
-            rooms[roomId].redCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "redChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-
-        } else if (dice >= 2 && clickCount === 2) {
-
-            rooms[roomId].redCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "redChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-
-        } else if (dice >= 3 && clickCount === 3) {
-
-            rooms[roomId].redCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "redChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-
-        } else if (dice >= 4 && clickCount === 4) {
-
-            rooms[roomId].redCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "redChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-
-        } else if (dice >= 5 && clickCount === 5) {
-
-            rooms[roomId].redCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "redChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-
-        } else if (dice >= 6 && clickCount === 6) {
-
-            rooms[roomId].redCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "redChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-
-        } else if (dice === undefined && clickCount === 1) {
-
-            rooms[roomId].redCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "redChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        } else if (dice === undefined && clickCount === 2) {
-
-            rooms[roomId].redCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "redChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        } else if (dice === undefined && clickCount === 3) {
-
-            rooms[roomId].redCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "redChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        }
-
-
+        socket.send(JSON.stringify({
+            type: "redChoose",
+            clickCount: clickCount,
+            command: command,
+            point: point
+        }));
 
         console.log(command);
 
@@ -553,101 +497,16 @@ server.on("connection", (socket) => {
 
 
 
-    function blueCommand(command, roomId, clickCount) {
+    function blueCommand(command, roomId, clickCount, point) {
 
-        const dice = rooms[roomId].blueDice;
+        rooms[roomId].blueCommands.move.push(command);
 
-        if (dice >= 1 && clickCount === 1) {
-
-            rooms[roomId].blueCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "blueChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        } else if (dice >= 2 && clickCount === 2) {
-
-            rooms[roomId].blueCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "blueChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        } else if (dice >= 3 && clickCount === 3) {
-
-            rooms[roomId].blueCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "blueChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        } else if (dice >= 4 && clickCount === 4) {
-
-            rooms[roomId].blueCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "blueChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        } else if (dice >= 5 && clickCount === 5) {
-
-            rooms[roomId].blueCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "blueChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        } else if (dice >= 6 && clickCount === 6) {
-
-            rooms[roomId].blueCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "blueChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        } else if (dice === undefined && clickCount === 1) {
-
-            rooms[roomId].blueCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "blueChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        } else if (dice === undefined && clickCount === 2) {
-
-            rooms[roomId].blueCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "blueChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        } else if (dice === undefined && clickCount === 3) {
-
-            rooms[roomId].blueCommands.move.push(command);
-
-            socket.send(JSON.stringify({
-                type: "blueChoose",
-                clickCount: clickCount,
-                command: command,
-                dice: dice
-            }));
-        }
+        socket.send(JSON.stringify({
+            type: "blueChoose",
+            clickCount: clickCount,
+            command: command,
+            point: point
+        }));
 
         console.log(command);
 
@@ -666,20 +525,6 @@ server.on("connection", (socket) => {
             console.log("redSkill =", redSkill);
             console.log("blueSkill =", blueSkill);
 
-            if (rooms[roomId].redDiceNext !== undefined) {
-
-                rooms[roomId].redDiceNext++;
-
-                console.log(rooms[roomId].redDiceNext)
-
-            } else if (rooms[roomId].blueDiceNext !== undefined) {
-
-                rooms[roomId].blueDiceNext++;
-
-            }
-
-            
-
             if (redSkill === undefined &&
                 blueSkill === undefined) {
 
@@ -695,16 +540,135 @@ server.on("connection", (socket) => {
 
                 setTimeout(() => {
 
+                    if (rooms[roomId].redReverse === true) {
+
+                        if (rooms[roomId].blueCommands.move[0] === 0) {
+
+                            rooms[roomId].blueCommands.move[0]++;
+
+                        } else if (rooms[roomId].blueCommands.move[0] === 1) {
+
+                            rooms[roomId].blueCommands.move[0]--;
+
+                        } else if (rooms[roomId].blueCommands.move[0] === 2) {
+
+                            rooms[roomId].blueCommands.move[0]++;
+
+                        } else if (rooms[roomId].blueCommands.move[0] === 3) {
+
+                            rooms[roomId].blueCommands.move[0]--;
+
+                        }
+
+                        if (rooms[roomId].blueCommands.move[1] === 0) {
+
+                            rooms[roomId].blueCommands.move[1]++;
+
+                        } else if (rooms[roomId].blueCommands.move[1] === 1) {
+
+                            rooms[roomId].blueCommands.move[1]--;
+
+                        } else if (rooms[roomId].blueCommands.move[1] === 2) {
+
+                            rooms[roomId].blueCommands.move[1]++;
+
+                        } else if (rooms[roomId].blueCommands.move[1] === 3) {
+
+                            rooms[roomId].blueCommands.move[1]--;
+
+                        }
+
+                        if (rooms[roomId].blueCommands.move[2] === 0) {
+
+                            rooms[roomId].blueCommands.move[2]++;
+
+                        } else if (rooms[roomId].blueCommands.move[2] === 1) {
+
+                            rooms[roomId].blueCommands.move[2]--;
+
+                        } else if (rooms[roomId].blueCommands.move[2] === 2) {
+
+                            rooms[roomId].blueCommands.move[2]++;
+
+                        } else if (rooms[roomId].blueCommands.move[2] === 3) {
+
+                            rooms[roomId].blueCommands.move[2]--;
+                            
+                        }
+                    }
+
                     blueMove(roomId);
 
                 }, 3000);
 
+
+
             } else if (redSkill === undefined &&
                 blueSkill !== undefined) {
+
+                console.log("青スキル発動！");
 
                 blueSkillFunction(blueSkill, roomId);
 
                 setTimeout(() => {
+
+                    if (rooms[roomId].blueReverse === true) {
+
+                        if (rooms[roomId].redCommands.move[0] === 0) {
+
+                            rooms[roomId].redCommands.move[0]++;
+                            
+                        } else if (rooms[roomId].redCommands.move[0] === 1) {
+
+                            rooms[roomId].redCommands.move[0]--;
+                            
+                        } else if (rooms[roomId].redCommands.move[0] === 2) {
+
+                            rooms[roomId].redCommands.move[0]++;
+                            
+                        } else if (rooms[roomId].redCommands.move[0] === 3) {
+
+                            rooms[roomId].redCommands.move[0]--;
+                            
+                        }
+
+                        if (rooms[roomId].redCommands.move[1] === 0) {
+
+                            rooms[roomId].redCommands.move[1]++;
+                            
+                        } else if (rooms[roomId].redCommands.move[1] === 1) {
+
+                            rooms[roomId].redCommands.move[1]--;
+                            
+                        } else if (rooms[roomId].redCommands.move[1] === 2) {
+
+                            rooms[roomId].redCommands.move[1]++;
+                            
+                        } else if (rooms[roomId].redCommands.move[1] === 3) {
+
+                            rooms[roomId].redCommands.move[1]--;
+                            
+                        }
+
+                        if (rooms[roomId].redCommands.move[2] === 0) {
+
+                            rooms[roomId].redCommands.move[2]++;
+                            
+                        } else if (rooms[roomId].redCommands.move[2] === 1) {
+
+                            rooms[roomId].redCommands.move[2]--;
+                            
+                        } else if (rooms[roomId].redCommands.move[2] === 2) {
+
+                            rooms[roomId].redCommands.move[2]++;
+                            
+                        } else if (rooms[roomId].redCommands.move[2] === 3) {
+
+                            rooms[roomId].redCommands.move[2]--;
+                            
+                        }
+                        
+                    }
 
                     redMove(roomId);
 
@@ -713,9 +677,13 @@ server.on("connection", (socket) => {
             } else if (redSkill !== undefined &&
                 blueSkill !== undefined) {
 
+                console.log("赤スキル発動！");
+
                 redSkillFunction(redSkill, roomId);
 
                 setTimeout(() => {
+
+                    console.log("青スキル発動！");
 
                     blueSkillFunction(blueSkill, roomId);
 
@@ -725,6 +693,22 @@ server.on("connection", (socket) => {
 
             rooms[roomId].count++;
 
+            rooms[roomId].redPoint = rooms[roomId].redPoint + 3;
+
+            rooms[roomId].bluePoint = rooms[roomId].bluePoint + 3;
+
+            if (rooms[roomId].redPoint > 6) {
+
+                rooms[roomId].redPoint = 6;
+
+            } else if (rooms[roomId].bluePoint > 6) {
+
+                rooms[roomId].bluePoint = 6;
+
+            }
+
+
+
         }, 700)
 
 
@@ -732,52 +716,46 @@ server.on("connection", (socket) => {
 
     function commandStart(roomId) {
 
-        console.log("redFinish =" + rooms[roomId].redFinish);
-        console.log("blueFinish =" + rooms[roomId].blueFinish);
+        setTimeout(() => {
 
-        console.log(
-            rooms[roomId].redDice,
-            rooms[roomId].blueDice,
-            rooms[roomId].redDiceNext,
-            rooms[roomId].blueDiceNext
-        )
+            console.log("redFinish =" + rooms[roomId].redFinish);
+            console.log("blueFinish =" + rooms[roomId].blueFinish);
 
-        if (rooms[roomId].redFinish === true && rooms[roomId].blueFinish === true) {
+            if (rooms[roomId].redFinish === true && rooms[roomId].blueFinish === true) {
 
-            console.log("通過！");
+                console.log("通過！");
 
-            rooms[roomId].player.forEach((player) => {
+                console.log("redPoint =", rooms[roomId].redPoint);
+                console.log("bluePoint =", rooms[roomId].bluePoint);
 
-                console.log("コマンドを表示します！");
+                const redPoint = rooms[roomId].redPoint;
+                const bluePoint = rooms[roomId].bluePoint;
 
-                player.send(JSON.stringify({
-                    type: "commandStart",
-                    redDice: rooms[roomId].redDice,
-                    blueDice: rooms[roomId].blueDice,
-                    redDiceNext: rooms[roomId].redDiceNext,
-                    blueDiceNext: rooms[roomId].blueDiceNext,
-                    playerNumber: socket.playerNumber
-                }));
-            });
+                rooms[roomId].player.forEach((player) => {
 
-            rooms[roomId].redClickCount = 0;
-            rooms[roomId].blueClickCount = 0;
+                    console.log("コマンドを表示します！");
 
-            rooms[roomId].redFinish = false;
-            rooms[roomId].blueFinish = false;
+                    player.send(JSON.stringify({
+                        type: "commandStart",
+                        redPoint: redPoint,
+                        bluePoint: bluePoint
+                    }));
+                });
 
-            if (rooms[roomId].redDiceNext === 2) {
+                rooms[roomId].redClickCount = 0;
+                rooms[roomId].blueClickCount = 0;
 
-                rooms[roomId].redDice = undefined;
-                rooms[roomId].redDiceNext = undefined;
-
-            } else if (rooms[roomId].blueDiceNext === 2) {
-
-                rooms[roomId].blueDice = undefined;
-                rooms[roomId].blueDiceNext = undefined;
+                rooms[roomId].redFinish = false;
+                rooms[roomId].blueFinish = false;
 
             }
-        }
+        }, 300)
+
+
+
+
+
+
 
 
     }
@@ -789,6 +767,20 @@ server.on("connection", (socket) => {
         console.log(rooms[roomId].redDice + "回！");
 
         setTimeout(() => {
+
+            if (commands.length === 0) {
+
+                rooms[roomId].redCommands.move = [];
+
+                rooms[roomId].redReady = false;
+                rooms[roomId].blueReady = false;
+
+                rooms[roomId].redFinish = true;
+
+                commandStart(roomId);
+
+                console.log("ooooo")
+            }
 
             if (commands[0] === 0) {
 
@@ -1055,6 +1047,20 @@ server.on("connection", (socket) => {
         const bluePosition = rooms[roomId].bluePosition;
 
         setTimeout(() => {
+
+            if (commands.length === 0) {
+
+                rooms[roomId].blueCommands.move = [];
+
+                rooms[roomId].redReady = false;
+                rooms[roomId].blueReady = false;
+
+                rooms[roomId].blueFinish = true;
+
+                commandStart(roomId);
+
+                console.log("ooooo")
+            }
 
             if (commands[0] === 0) {
 
@@ -1475,7 +1481,11 @@ server.on("connection", (socket) => {
 
         const currentY = bluePosition.y;
 
-        if (bluePosition.y !== 9) {
+        if (bluePosition.y === 8 && bluePosition.x <= 2) {
+
+        } else if (bluePosition.y === 8 && bluePosition.x >= 6) {
+
+        } else {
 
             bluePosition.y++;
 
@@ -1491,11 +1501,21 @@ server.on("connection", (socket) => {
                 }));
             });
 
-            if (bluePosition.y === 9) {
+            if (bluePosition.y === 9 && bluePosition.x >= 3 && bluePosition.x <= 5) {
 
-                blueWin(roomId)
+                blueWin(roomId);
             }
+
         }
+
+
+
+
+
+
+
+
+
 
     }
 
@@ -1553,12 +1573,30 @@ server.on("connection", (socket) => {
 
         console.log("赤が青を捕まえました！");
 
-        rooms[roomId].player.forEach((player) => {
+        if (rooms[roomId].redCounter !== true && rooms[roomId].blueCounter !== true) {
 
-            player.send(JSON.stringify({
-                type: "redWin"
-            }));
-        });
+            console.log("redWin");
+
+            rooms[roomId].player.forEach((player) => {
+
+                player.send(JSON.stringify({
+                    type: "redWin"
+                }));
+            });
+
+        } else {
+
+            console.log("blueWin");
+
+            rooms[roomId].player.forEach((player) => {
+
+                player.send(JSON.stringify({
+                    type: "blueWin"
+                }));
+
+            });
+
+        }
 
     }
 
@@ -1566,12 +1604,33 @@ server.on("connection", (socket) => {
 
         console.log("青が逃げ切りました！");
 
-        rooms[roomId].player.forEach((player) => {
+        if (rooms[roomId].redCounter !== true && rooms[roomId].blueCounter !== true) {
 
-            player.send(JSON.stringify({
-                type: "blueWin"
-            }));
-        });
+            console.log("blueWin");
+
+            rooms[roomId].player.forEach((player) => {
+
+                player.send(JSON.stringify({
+                    type: "blueWin"
+                }));
+
+            });
+
+        } else {
+
+            console.log("redWin");
+
+            rooms[roomId].player.forEach((player) => {
+
+                player.send(JSON.stringify({
+                    type: "redWin"
+                }));
+
+            });
+
+        }
+
+
     }
 
     function redSkillFunction(skill, roomId) {
@@ -1620,27 +1679,27 @@ server.on("connection", (socket) => {
 
             } else if (skill === 1) {
 
-                console.log("運命のダイス発動！");
+                console.log("カウンター発動！");
 
-                rooms[roomId].redDice = Math.floor(Math.random() * 6) + 1;
+                rooms[roomId].redCounter = true;
 
-                const dice = rooms[roomId].redDice;
+                console.log(rooms[roomId].redCounter);
 
-                rooms[roomId].player.forEach((player) => {
+            } else if (skill === 2) {
 
-                    player.send(JSON.stringify({
-                        type: "diceResult",
-                        dice: dice
-                    }));
-                });
+                console.log("リバース発動！");
 
+                rooms[roomId].redReverse = true;
 
-                rooms[roomId].redSkillCount = 1;
-
-                rooms[roomId].redDiceNext = 1;
+                console.log(rooms[roomId].redReverse);
             }
 
-        }, 2500);
+        }, 2500)
+
+
+
+
+
 
         rooms[roomId].redFinish = true;
 
@@ -1694,33 +1753,27 @@ server.on("connection", (socket) => {
 
                 rooms[roomId].blueSkillCount = 1;
 
-                
+
             } else if (skill === 1) {
 
-                console.log("運命のダイス発動！");
+                console.log("カウンター発動！");
 
-                rooms[roomId].blueDice = Math.floor(Math.random() * 6) + 1;
+                rooms[roomId].blueCounter = true;
 
-                const dice = rooms[roomId].blueDice;
+                console.log(rooms[roomId].blueCounter);
 
-                rooms[roomId].player.forEach((player) => {
+            } else if (skill === 2) {
 
-                    player.send(JSON.stringify({
-                        type: "blueDiceResult",
-                        dice: dice
-                    }));
-                });
+                console.log("リバース発動！");
 
-                rooms[roomId].blueSkillCount = 1;
+                rooms[roomId].blueReverse = true;
 
-                rooms[roomId].blueDiceNext = 1;
+                console.log(rooms[roomId].blueReverse);
             }
 
             rooms[roomId].blueFinish = true;
 
             rooms[roomId].blueCommands.skill = undefined;
-
-            commandStart(roomId);
 
         }, 2500);
 

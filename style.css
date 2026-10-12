@@ -58,6 +58,14 @@
     font-size: 100px;
 }
 
+#goal {
+    background-color: yellow;
+    position: absolute;
+    top: 506px;
+    left: 215px;
+    font-size: 41px;
+}
+
 
 
 @keyframes move1 {

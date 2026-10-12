@@ -21,6 +21,9 @@ const matching = document.getElementById("matching");
 
 const skill0 = document.getElementById("skill0");
 const skill1 = document.getElementById("skill1");
+const skill2 = document.getElementById("skill2");
+
+const skillNow = document.getElementById("skillNow");
 
 let skillNumber = 0;
 
@@ -83,6 +86,9 @@ socket.addEventListener("message", (event) => {
         const blueX = data.blueX;
         const blueY = data.blueY;
 
+        const redPoint = data.redPoint;
+        const bluePoint = data.bluePoint;
+
 
         run(redX, redY, blueX, blueY);
 
@@ -90,6 +96,9 @@ socket.addEventListener("message", (event) => {
         console.log(redY);
         console.log(blueX);
         console.log(blueY);
+
+        redPointNow.textContent = "ポイント：" + redPoint + "p";
+        bluePointNow.textContent = "ポイント：" + bluePoint + "p";
 
         updataButton();
     }
@@ -107,9 +116,11 @@ socket.addEventListener("message", (event) => {
 
         const command = data.command;
 
-        const dice = data.dice;
+        const point = data.point;
 
-        console.log(clickCount, command);
+        console.log(clickCount, command, point);
+
+        redPointNow.textContent = "ポイント：" + point + "p"
 
         if (clickCount === 1) {
 
@@ -250,7 +261,11 @@ socket.addEventListener("message", (event) => {
 
         const command = data.command;
 
-        console.log(clickCount, command);
+        const point = data.point;
+
+        console.log(clickCount, command, point);
+
+        bluePointNow.textContent = "ポイント：" + point + "p"
 
         if (clickCount === 1) {
 
@@ -389,47 +404,36 @@ socket.addEventListener("message", (event) => {
 
     }
 
+    if (data.type === "redChooseSkill") {
+
+        const point = data.point;
+        
+        redPointNow.textContent = "ポイント：" + point + "p";
+    }
+
+    if (data.type === "blueChooseSkill") {
+        
+        const point = data.point;
+
+        bluePointNow.textContent = "ポイント：" + point + "p";
+    }
+
     if (data.type === "commandStart") {
 
-        const redDice = data.redDice;
-        const blueDice = data.blueDice;
-        const redDiceNext = data.redDiceNext;
-        const blueDiceNext = data.blueDiceNext;
+        const redPoint = data.redPoint;
+        const bluePoint = data.bluePoint;
 
         console.log("command start!");
+
+        console.log(redPoint);
+        console.log(bluePoint);
+
+        redPointNow.textContent = "ポイント：" + redPoint + "p";
+        bluePointNow.textContent = "ポイント：" + bluePoint + "p";
 
         red.style.display = "block";
 
         blue.style.display = "block";
-
-        console.log(redDice, redDiceNext);
-
-        if (redDice >= 4 && redDiceNext === 2) {
-
-            red4th.style.display = "none";
-            red5th.style.display = "none";
-            red6th.style.display = "none";
-
-        } else if (redDice <= 3 && redDiceNext === 2) {
-
-            redFirst.style.display = "block";
-            redSecond.style.display = "block";
-            redThird.style.display = "block";
-        }
-
-        if (blueDice >= 4 && blueDiceNext === 2) {
-            
-            blue4th.style.display = "none";
-            blue5th.style.display = "none";
-            blue6th.style.display = "none";
-
-        } else if (blueDice <= 3 && blueDiceNext === 2) {
-
-            blueFirst.style.display = "block";
-            blueSecond.style.display = "block";
-            blueThird.style.display = "block";
-
-        }
 
         updataButton();
     }
@@ -848,7 +852,6 @@ socket.addEventListener("message", (event) => {
         blueResult.textContent = "YOU WIN!";
         redFinish.style.display = "block";
         redResult.textContent = "YOU LOSE...";
-        
 
         updataButton();
 
@@ -876,6 +879,12 @@ socket.addEventListener("message", (event) => {
 
         updataButton();
     }
+
+    // if (data.type === "log") {
+
+    //     log.textContent = data.log;
+
+    // }
 
 
 
@@ -927,6 +936,8 @@ skill0.addEventListener("click", () => {
     skillNumber = 0;
 
     console.log(skillNumber);
+
+    skillNow.textContent = "今のスキル---入れ替え";
 });
 
 skill1.addEventListener("click", () => {
@@ -934,6 +945,17 @@ skill1.addEventListener("click", () => {
     skillNumber = 1;
 
     console.log(skillNumber);
+
+    skillNow.textContent = "今のスキル---カウンター";
+});
+
+skill2.addEventListener("click", () => {
+
+    skillNumber = 2;
+
+    console.log(skillNumber);
+
+    skillNow.textContent = "今のスキル---リバース";
 });
 
 
@@ -1033,6 +1055,9 @@ const oneMore = document.getElementById("oneMore");
 
 const redFinish = document.getElementById("redFinish");
 const blueFinish = document.getElementById("blueFinish");
+
+const redPointNow = document.getElementById("redPointNow");
+const bluePointNow = document.getElementById("bluePointNow");
 
 
 
@@ -1182,6 +1207,12 @@ redChooseSkill.addEventListener("click", () => {
             type: "redChooseSkill",
             skill: 1
         }));
+    } else if (skillNumber === 2) {
+
+        socket.send(JSON.stringify({
+            type: "redChooseSkill",
+            skill: 2
+        }));
     }
 
     sound1.pause();
@@ -1204,6 +1235,12 @@ blueChooseSkill.addEventListener("click", () => {
         socket.send(JSON.stringify({
             type: "blueChooseSkill",
             skill: 1
+        }));
+    } else if (skillNumber === 2) {
+
+        socket.send(JSON.stringify({
+            type: "blueChooseSkill",
+            skill: 2
         }));
     }
 
